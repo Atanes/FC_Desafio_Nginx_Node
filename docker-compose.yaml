@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  node-app:
+    build: ./node
+    container_name: node-app
+    hostname: node-app
+    volumes:
+      - ./node:/usr/src/app
+    tty: true
+    environment:
+      MYSQL_DATABASE: nodedb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: db
+    depends_on:
+      - db
+    restart: on-failure
+  db:
+    build: ./db
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=pnodedb
+    networks:
+      - node-network
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - node-app
