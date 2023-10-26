@@ -1,35 +1,41 @@
 version: '3'
 
 services:
-  node-app:
+  db:
+    build: ./db
+    container_name: desafio-db
+    hostname: desafio-db
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=password
+    restart: always
+
+  app:
     build: ./node
-    container_name: node-app
-    hostname: node-app
+    container_name: app
+    hostname: app
+    ports:
+      - "5000:5000"
     volumes:
       - ./node:/usr/src/app
+      - /usr/src/app/node_modules
     tty: true
     environment:
       MYSQL_DATABASE: nodedb
       MYSQL_USER: root
       MYSQL_PASSWORD: password
-      MYSQL_HOST: db
+      MYSQL_HOST: desafio-db
     depends_on:
       - db
     restart: on-failure
-  db:
-    build: ./db
-    volumes:
-      - ./mysql:/var/lib/mysql
-    environment:
-      - MYSQL_DATABASE=nodedb
-      - MYSQL_ROOT_PASSWORD=pnodedb
-    networks:
-      - node-network
+
   nginx:
     build: ./nginx
-    container_name: nginx
-    hostname: nginx
+    container_name: desafio-nginx
+    hostname: desafio-nginx
     ports:
-      - "8080:80"
+      - '8080:80'
     depends_on:
-      - node-app
+      - app
