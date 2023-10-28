@@ -2,9 +2,9 @@ const express = require('express');
 const mysql = require('mysql');
 const app = express();
 
-const port = 5000;
+const port = 3000;
 const config = {
-	host: 'desafio-db',
+	host: 'db',
 	user: 'root',
 	password: 'password',
 	database: 'nodedb',

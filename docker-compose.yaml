@@ -3,8 +3,8 @@ version: '3'
 services:
   db:
     build: ./db
-    container_name: desafio-db
-    hostname: desafio-db
+    container_name: db
+    hostname: db
     volumes:
       - ./mysql:/var/lib/mysql
     environment:
@@ -15,9 +15,10 @@ services:
   app:
     build: ./node
     container_name: app
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm install && node index.js"
     hostname: app
     ports:
-      - "5000:5000"
+      - "3000:3000"
     volumes:
       - ./node:/usr/src/app
       - /usr/src/app/node_modules
@@ -26,15 +27,15 @@ services:
       MYSQL_DATABASE: nodedb
       MYSQL_USER: root
       MYSQL_PASSWORD: password
-      MYSQL_HOST: desafio-db
+      MYSQL_HOST: db
     depends_on:
       - db
     restart: on-failure
 
   nginx:
     build: ./nginx
-    container_name: desafio-nginx
-    hostname: desafio-nginx
+    container_name: nginx
+    hostname: nginx
     ports:
       - '8080:80'
     depends_on:
